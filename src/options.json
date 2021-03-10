@@ -1,0 +1,72 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "indexPath": {
+      "description": "The location of index.html",
+      "type": "string"
+    },
+    "renderer": {
+      "description": "A custom PuppeteerRenderer instance"
+    },
+    "routes": {
+      "description": "All the routes to pre-render",
+      "type": "array"
+    },
+    "postProcess": {
+      "description": "Allows you to customize the HTML and output path before writing the rendered contents to a file.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "instanceof": "Function"
+        }
+      ]
+    },
+    "server": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "description": "Normally a free port is autodetected, but feel free to set this if needed.",
+          "type": "number"
+        }
+      }
+    },
+    "rendererOptions": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "injectProperty": {
+          "description": "The name of the property to add to the window object with the contents of `inject`",
+          "type": "string"
+        },
+        "inject": {
+          "description": "Any values you'd like your app to have access to via `window.injectProperty",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "maxConcurrentRoutes": {
+          "type": "number",
+          "description": "Use this to limit the number of routes rendered in parallel. Defaults to 0, no limit"
+        },
+        "renderAfterDocumentEvent": {
+          "type": "string",
+          "description": "Wait to render until the specified event is dispatched on the document. eg: with `document.dispatchEvent(new Event('custom-render-trigger')"
+        },
+        "renderAfterElementExists": {
+          "type": "string",
+          "description": "Wait to render until the specified element is detected using `document.querySelector`"
+        },
+        "renderAfterTime": {
+          "type": "number",
+          "description": "Wait to render until a certain amount of time has passed. NOT RECOMMENDED"
+        },
+        "headless": {
+          "type": "boolean",
+          "description": "Display the browser window when rendering. Useful for debugging."
+        }
+      }
+    }
+  },
+  "type": "object"
+}

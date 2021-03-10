@@ -3,14 +3,12 @@
   <em>Flexible, framework-agnostic static site generation for sites and SPAs built with webpack.</em>
 </p>
 
-<p align="center"><img width="200" src="https://raw.githubusercontent.com/chrisvfritz/prerender-spa-plugin/master/assets/logo.png?raw=true"></p>
-
 ---
 
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/prerender-spa-plugin.svg)]()
-[![npm downloads](https://img.shields.io/npm/dt/prerender-spa-plugin.svg)]()
+[![npm version](https://img.shields.io/npm/v/prerender-spa-plugin-next.svg)]()
+[![npm downloads](https://img.shields.io/npm/dt/prerender-spa-plugin-next.svg)]()
 [![Dependency Status](https://img.shields.io/david/chrisvfritz/prerender-spa-plugin.svg)](https://david-dm.org/chrisvfritz/prerender-spa-plugin)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://standardjs.com/)
 [![license](https://img.shields.io/github/license/chrisvfritz/prerender-spa-plugin.svg)]()
@@ -21,13 +19,13 @@
 
 <div align="center">
 
-[![NPM](https://nodei.co/npm/prerender-spa-plugin.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/prerender-spa-plugin/)
+[![NPM](https://nodei.co/npm/prerender-spa-plugin-next.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/prerender-spa-plugin-next/)
 
 </div>
 
-## About prerender-spa-plugin
+## About prerender-spa-plugin-next
 
-**:point_right: This is the stable `3.x` version of `prerender-spa-plugin` based on puppeteer. If you're looking for the (now-deprecated) `2.x` version, based on PhantomJS, take a look at the `v2` branch.**
+**:point_right: This is the stable `4.x` version of `prerender-spa-plugin-next` based on puppeteer. If you're looking for the (now-deprecated) `2.x` version, based on PhantomJS, take a look at the `v2` branch.**
 
 The goal of this plugin is to provide a simple prerendering solution that is easily extensible and usable for any site or single-page-app built with webpack.
 
@@ -45,7 +43,7 @@ Framework-specific examples can be found in the `examples/` directory.
 ### Basic Usage (`webpack.config.js`)
 ```js
 const path = require('path')
-const PrerenderSPAPlugin = require('prerender-spa-plugin')
+const PrerenderSPAPlugin = require('prerender-spa-plugin-next')
 
 module.exports = {
   plugins: [
@@ -64,7 +62,7 @@ module.exports = {
 
 ```js
 const path = require('path')
-const PrerenderSPAPlugin = require('prerender-spa-plugin')
+const PrerenderSPAPlugin = require('prerender-spa-plugin-next')
 const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
 
 module.exports = {
@@ -86,7 +84,7 @@ module.exports = {
 
       // Optional - Allows you to customize the HTML and output path before
       // writing the rendered contents to a file.
-      // renderedRoute can be modified and it or an equivelant should be returned.
+      // renderedRoute can be modified and it or an equivalent should be returned.
       // renderedRoute format:
       // {
       //   route: String, // Where the output file will end up (relative to outputDir)
@@ -106,17 +104,6 @@ module.exports = {
         }
 
         return renderedRoute
-      },
-
-      // Optional - Uses html-minifier (https://github.com/kangax/html-minifier)
-      // To minify the resulting HTML.
-      // Option reference: https://github.com/kangax/html-minifier#options-quick-reference
-      minify: {
-        collapseBooleanAttributes: true,
-        collapseWhitespace: true,
-        decodeEntities: true,
-        keepClosingSlash: true,
-        sortAttributes: true
       },
 
       // Server configuration options.
@@ -161,14 +148,14 @@ module.exports = {
 ```
 
 ### v2.x Compability
-Most usages of `prerender-spa-plugin` v2.x should be compatible with v3.x.
+Most usages of `prerender-spa-plugin-next` v2.x should be compatible with v3.x.
 The exception being advanced configuration options that controlled PhantomJS. These have been replaced by pluggable renderers with their own specific configuration options.
 
 If you use this format, you will be greeted with a warning prompting you to migrate to the new object-based configuration format, but it should still function for the time being.
 
 ```js
 const path = require('path')
-const PrerenderSPAPlugin = require('prerender-spa-plugin')
+const PrerenderSPAPlugin = require('prerender-spa-plugin-next')
 
 module.exports = {
 
@@ -247,7 +234,7 @@ module.exports = {
   ```
   in order to reduce ambiguity. The old format still works for the time being.
 - The default renderer is no longer PhantomJS. It has been replaced with [puppeteer](https://github.com/GoogleChrome/puppeteer). It is fairly simple to develop your own renderer as well. An alternate [jsdom](https://github.com/tmpvar/jsdom)-based renderer is available at [@prerenderer/renderer-jsdom](https://www.npmjs.com/package/@prerenderer/renderer-jsdom).
-- `prerender-spa-plugin` is now based on [prerenderer](https://github.com/Tribex/prerenderer). Accordingly, most bugs should be reported in that repository.
+- `prerender-spa-plugin-next` is now based on [prerenderer](https://github.com/Tribex/prerenderer). Accordingly, most bugs should be reported in that repository.
 
 ## What is Prerendering?
 
@@ -296,7 +283,7 @@ In the interest of transparency, there are some use-cases where prerendering mig
 
 #### Using The postProcess Option
 
-The `postProcess(Object context): Object | Promise` function in your renderer configuration allows you to adjust the output of `prerender-spa-plugin` before writing it to a file. It is called once per rendered route and is passed a `context` object in the form of:
+The `postProcess(Object context): Object | Promise` function in your renderer configuration allows you to adjust the output of `prerender-spa-plugin-next` before writing it to a file. It is called once per rendered route and is passed a `context` object in the form of:
 
 ```javascript
 {
@@ -376,7 +363,7 @@ If you are having issues prerendering with Vue.js, try adding the [`data-server-
 ### JS not firing before prerender?
 
 If you have code that relies on the existence of `<body>` (and you almost certainly do), simply run it in a callback to the `DOMContentLoaded` event:
-*(Otherwise you'll find that `prerender-spa-plugin` will output the contents of your page before your JS runs.)*
+*(Otherwise you'll find that `prerender-spa-plugin-next` will output the contents of your page before your JS runs.)*
 
 ```js
 document.addEventListener('DOMContentLoaded', function () {
@@ -404,7 +391,7 @@ Either way, there will not be any unnecessary styles inside JS.
 
 ### Caveats
 
-- For obvious reasons, `prerender-spa-plugin` only works for SPAs that route using the HTML5 history API. `index.html#/hash/route` URLs will unfortunately not work.
+- For obvious reasons, `prerender-spa-plugin-next` only works for SPAs that route using the HTML5 history API. `index.html#/hash/route` URLs will unfortunately not work.
 - Whatever client-side rendering library you're using should be able to at least replace any server-rendered content or diff with it.
   - For **Vue.js 1** use [`replace: false`](http://vuejs.org/api/#replace) on root components.
   - For **Vue.js 2**  Ensure your root component has the same id as the prerendered element it's replacing. Otherwise you'll end up with duplicated content.
@@ -416,7 +403,7 @@ Either way, there will not be any unnecessary styles inside JS.
 - [react-snap](https://github.com/stereobooster/react-snap) - Zero-configuration framework-agnostic prerendering. Does not depend on webpack. Handles a variety of edge-cases.
 - [snapshotify](https://github.com/errorception/snapshotify) - An experimental prerenderer that performes a number of speed optimizations.
 - [presite](https://github.com/egoist/presite) - Minimal-configuration framework-agnostic prerendering.
-- [prerenderer](https://github.com/tribex/prerenderer) - Pluggable prerendering library that `prerender-spa-plugin` `v3+` is based on.
+- [prerenderer](https://github.com/tribex/prerenderer) - Pluggable prerendering library that `prerender-spa-plugin-next` `v3+` is based on.
 
 ## License (MIT)
 
