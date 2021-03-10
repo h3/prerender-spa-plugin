@@ -1,11 +1,7 @@
 import { validate } from 'schema-utils'
 import schema from './options.json'
-// import serialize from 'serialize-javascript'
 
 const path = require('path')
-
-const Prerenderer = require('@prerenderer/prerenderer')
-const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer')
 
 export default class PrerenderSPAPlugin {
   constructor (options = {}) {
@@ -16,23 +12,47 @@ export default class PrerenderSPAPlugin {
 
     this.options = options
 
+    const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer')
     this.options.renderer = this.options.renderer || new PuppeteerRenderer(Object.assign({}, { headless: true }, this.options.rendererOptions))
   }
 
-  async prerender (compiler, compilation, assets) {
-    console.log(assets)
-    // TODO add cache
-    // const cache = compilation.getCache('PrerenderSPAPlugin')
+  async prerender (compiler, compilation) {
+    const Prerenderer = require('@prerenderer/prerenderer')
+    const indexPath = this.options.indexPath || 'index.html'
 
-    // const cacheItem = cache.getItemCache(
-    //   serialize({
-    //     name,
-    //     options: this.options
-    //   }),
-    //   cache.getLazyHashedEtag(source)
-    // );
-    // const output = (await cacheItem.getPromise()) || {};
-    const PrerendererInstance = new Prerenderer(this.options)
+    const PrerendererInstance = new Prerenderer({ staticDir: compiler.options.output.path, ...this.options, assets: compilation.assets })
+    const prev = PrerendererInstance.modifyServer
+    PrerendererInstance.modifyServer = (server, stage) => {
+      if (stage === 'post-fallback') {
+        server = server._expressServer
+        const routes = server._router.stack
+        routes.forEach((route, i) => {
+          if (route.route && route.route.path === '*') {
+            routes.splice(i, 1)
+          }
+        })
+
+        server.get('*', (req, res) => {
+          let path = req.path.slice(1, req.path.endsWith('/') ? -1 : undefined)
+          path = path in compilation.assets || path.includes('.') ? path : path + '/' + indexPath
+          if (path.startsWith('/')) {
+            path = path.slice(1)
+          }
+          if (path in compilation.assets) {
+            res.type(path)
+            res.send(compilation.assets[path].source())
+          } else if (indexPath in compilation.assets) {
+            res.send(compilation.assets[indexPath].source())
+          } else if ('index.html' in compilation.assets) {
+            res.send(compilation.assets['index.html'].source())
+          } else {
+            compilation.errors.push(new Error('[prerender-spa-plugin] ' + path + ' not found during prerender'))
+            res.status(404)
+          }
+        })
+      }
+      prev.call(PrerendererInstance, server, stage)
+    }
 
     try {
       await PrerendererInstance.initialize()
@@ -50,20 +70,22 @@ export default class PrerenderSPAPlugin {
       }
 
       // Calculate outputPath if it hasn't been set already.
-      renderedRoutes.forEach(rendered => {
-        if (!rendered.outputPath) {
-          rendered.outputPath = path.join(rendered.route, this.options.indexPath || 'index.html')
-        }
-      })
+      renderedRoutes.forEach(processedRoute => {
+        // Create dirs and write prerendered files.
+        if (!processedRoute.outputPath) {
+          processedRoute.outputPath = path.join(processedRoute.route, indexPath)
 
-      // Create dirs and write prerendered files.
-      renderedRoutes.forEach((processedRoute) => {
-        compilation.emitAsset(processedRoute.outputPath, processedRoute.html.trim(), { prerendered: true })
+          if (processedRoute.outputPath.startsWith('/')) {
+            processedRoute.outputPath = processedRoute.outputPath.slice(1)
+          }
+        }
+        const fn = processedRoute.outputPath in compilation.assets ? compilation.updateAsset : compilation.emitAsset
+        fn.call(compilation, processedRoute.outputPath, new compiler.webpack.sources.RawSource(processedRoute.html.trim(), false), {
+          prerendered: true
+        })
       })
     } catch (err) {
       const msg = '[prerender-spa-plugin] Unable to prerender all routes!'
-      console.error(msg)
-      console.error(err)
       compilation.errors.push(new Error(msg))
       compilation.errors.push(err)
     }
@@ -73,16 +95,11 @@ export default class PrerenderSPAPlugin {
 
   apply (compiler) {
     const pluginName = this.constructor.name
+    compiler.hooks.compilation.tap(pluginName, (compilation) => {
+      const HtmlWebpackPlugin = require('html-webpack-plugin')
+      const hooks = HtmlWebpackPlugin.getHooks(compilation)
 
-    compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
-      compilation.hooks.processAssets.tapPromise(
-        {
-          name: pluginName,
-          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_DERIVED,
-          additionalAssets: true
-        },
-        (assets) => this.prerender(compiler, compilation, assets)
-      )
+      hooks.afterEmit.tapPromise(pluginName, () => this.prerender(compiler, compilation))
     })
   }
 }

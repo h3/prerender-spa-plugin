@@ -9,7 +9,7 @@
 
 [![npm version](https://img.shields.io/npm/v/prerender-spa-plugin-next.svg)]()
 [![npm downloads](https://img.shields.io/npm/dt/prerender-spa-plugin-next.svg)]()
-[![Dependency Status](https://img.shields.io/david/chrisvfritz/prerender-spa-plugin.svg)](https://david-dm.org/chrisvfritz/prerender-spa-plugin)
+[![Dependency Status](https://img.shields.io/david/tofandel/prerender-spa-plugin.svg)](https://david-dm.org/tofandel/prerender-spa-plugin)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://standardjs.com/)
 [![license](https://img.shields.io/github/license/chrisvfritz/prerender-spa-plugin.svg)]()
 
@@ -25,11 +25,17 @@
 
 ## About prerender-spa-plugin-next
 
-**:point_right: This is the stable `4.x` version of `prerender-spa-plugin-next` based on puppeteer. If you're looking for the (now-deprecated) `2.x` version, based on PhantomJS, take a look at the `v2` branch.**
+**:point_right: This is the stable `4.x` version of `prerender-spa-plugin-next` based on puppeteer.**
 
 The goal of this plugin is to provide a simple prerendering solution that is easily extensible and usable for any site or single-page-app built with webpack.
 
 Plugins for other task runners and build systems are planned.
+
+## Requirements
+Currently this plugin only works with webpack 5 and requires the html-webpack-plugin to be setup
+
+## Installation
+`npm i -D prerender-spa-plugin-next`
 
 ## Examples
 Framework-specific examples can be found in the `examples/` directory.
@@ -49,8 +55,6 @@ module.exports = {
   plugins: [
     ...
     new PrerenderSPAPlugin({
-      // Required - The path to the webpack-outputted app to prerender.
-      staticDir: path.join(__dirname, 'dist'),
       // Required - Routes to render.
       routes: [ '/', '/about', '/some/deep/nested/route' ],
     })
@@ -69,15 +73,8 @@ module.exports = {
   plugins: [
     ...
     new PrerenderSPAPlugin({
-      // Required - The path to the webpack-outputted app to prerender.
-      staticDir: path.join(__dirname, 'dist'),
-
-      // Optional - The path your rendered app should be output to.
-      // (Defaults to staticDir.)
-      outputDir: path.join(__dirname, 'prerendered'),
-
       // Optional - The location of index.html
-      indexPath: path.join(__dirname, 'dist', 'index.html'),
+      indexPath: 'index.html',
 
       // Required - Routes to render.
       routes: [ '/', '/about', '/some/deep/nested/route' ],
@@ -147,12 +144,6 @@ module.exports = {
 }
 ```
 
-### v2.x Compability
-Most usages of `prerender-spa-plugin-next` v2.x should be compatible with v3.x.
-The exception being advanced configuration options that controlled PhantomJS. These have been replaced by pluggable renderers with their own specific configuration options.
-
-If you use this format, you will be greeted with a warning prompting you to migrate to the new object-based configuration format, but it should still function for the time being.
-
 ```js
 const path = require('path')
 const PrerenderSPAPlugin = require('prerender-spa-plugin-next')
@@ -163,8 +154,6 @@ module.exports = {
 
   plugins: [
     new PrerenderSPAPlugin(
-      // (REQUIRED) Absolute path to static root
-      path.join(__dirname, 'relative/path/to/static/root'),
       // (REQUIRED) List of routes to prerender
       [ '/', '/about', '/contact' ],
       // (OPTIONAL) Compatible options from v2.
@@ -265,11 +254,8 @@ In the interest of transparency, there are some use-cases where prerendering mig
 
 | Option | Type | Required? | Default | Description |
 |-------------|-------------------------------------------|-----------|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| staticDir | String | Yes | None | The root path to serve your app from. |
-| outputDir | String | No | None | Where the prerendered pages should be output. If not set, defaults to staticDir. |
-| indexPath | String | No | `staticDir/index.html` | The index file to fall back on for SPAs. |
+| indexPath | String | No | `index.html` | The index file to fall back on for SPAs. |
 | postProcess | Function(Object context): [Object \| Promise] | No | None | See the [Using the postProcess Option](#using-the-postprocess-option) section. |
-| minify | Object | No | None | Minifies the resulting HTML using [html-minifier](https://github.com/kangax/html-minifier). Full list of options available [here](https://github.com/kangax/html-minifier#options-quick-reference). |
 | server | Object | No | None | App server configuration options (See below) |
 | renderer | Renderer Instance or Configuration Object | No | `new PuppeteerRenderer()` | The renderer you'd like to use to prerender the app. It's recommended that you specify this, but if not it will default to `@prerenderer/renderer-puppeteer`. |
 
@@ -435,24 +421,10 @@ SOFTWARE.
   <tbody>
     <tr>
       <td align="center">
-        <a href="https://github.com/chrisvfritz">
-          <img width="150" height="150" src="https://github.com/chrisvfritz.png?v=3&s=150">
+        <a href="https://github.com/tofandel">
+          <img width="150" height="150" src="https://github.com/tofandel.png?v=3&s=150">
           </br>
-          Chris Fritz
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/drewlustro">
-          <img width="150" height="150" src="https://github.com/drewlustro.png?v=3&s=150">
-          </br>
-          Drew Lustro
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/tribex">
-          <img width="150" height="150" src="https://github.com/tribex.png?v=3&s=150">
-          </br>
-          Joshua Bemenderfer
+          Adrien Foulon
         </a>
       </td>
     </tr>

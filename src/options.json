@@ -1,5 +1,5 @@
 {
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
     "indexPath": {
       "description": "The location of index.html",
