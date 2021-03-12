@@ -33,20 +33,29 @@ export default class PrerenderSPAPlugin {
         })
 
         server.get('*', (req, res) => {
-          let path = req.path.slice(1, req.path.endsWith('/') ? -1 : undefined)
-          path = path in compilation.assets || path.includes('.') ? path : path + '/' + indexPath
-          if (path.startsWith('/')) {
-            path = path.slice(1)
+          let url = req.path.slice(1, req.path.endsWith('/') ? -1 : undefined)
+          url = url in compilation.assets || url.includes('.') ? url : url + '/' + indexPath
+          if (url.startsWith('/')) {
+            url = url.slice(1)
           }
-          if (path in compilation.assets) {
-            res.type(path)
-            res.send(compilation.assets[path].source())
+          if (url in compilation.assets) {
+            if (url.endsWith('.json')) {
+              res.json(JSON.parse(compilation.assets[url].source()))
+            } else {
+              try {
+                res.type(path.extname(url))
+                res.send(compilation.assets[url].source())
+              } catch (e) {
+                res.status(500)
+                compilation.errors.push(new Error('[prerender-spa-plugin] Failed to deliver ' + url + ', is the type of the file correct?'))
+              }
+            }
           } else if (indexPath in compilation.assets) {
             res.send(compilation.assets[indexPath].source())
           } else if ('index.html' in compilation.assets) {
             res.send(compilation.assets['index.html'].source())
           } else {
-            compilation.errors.push(new Error('[prerender-spa-plugin] ' + path + ' not found during prerender'))
+            compilation.errors.push(new Error('[prerender-spa-plugin] ' + url + ' not found during prerender'))
             res.status(404)
           }
         })
