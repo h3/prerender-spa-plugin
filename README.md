@@ -108,10 +108,11 @@ module.exports = {
         // Normally a free port is autodetected, but feel free to set this if needed.
         port: 8001
       },
-
+      //renderer: new Renderer(),
       // The actual renderer to use. (Feel free to write your own)
       // Available renderers: https://github.com/Tribex/prerenderer/tree/master/renderers
-      renderer: new Renderer({
+
+      rendererOptions: {
         // Optional - The name of the property to add to the window object with the contents of `inject`.
         injectProperty: '__PRERENDER_INJECTED',
         // Optional - Any values you'd like your app to have access to via `window.injectProperty`.
@@ -138,7 +139,7 @@ module.exports = {
         // Other puppeteer options.
         // (See here: https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions)
         headless: false // Display the browser window when rendering. Useful for debugging.
-      })
+      }
     })
   ]
 }
