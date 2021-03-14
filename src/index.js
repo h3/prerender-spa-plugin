@@ -12,13 +12,17 @@ export default class PrerenderSPAPlugin {
 
     this.options = options
 
-    const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer')
-    this.options.renderer = this.options.renderer || new PuppeteerRenderer(Object.assign({}, { headless: true }, this.options.rendererOptions))
+    this.options.renderer = this.options.renderer || require('@prerenderer/renderer-puppeteer')
+    this.options.indexPath = this.options.indexPath || 'index.html'
+    this.options.rendererOptions = Object.assign({ headless: true }, this.options.rendererOptions)
+    if (!this.options.renderer.initialize) {
+      this.options.renderer = this.options.renderer(this.options.rendererOptions)
+    }
   }
 
   async prerender (compiler, compilation) {
     const Prerenderer = require('@prerenderer/prerenderer')
-    const indexPath = this.options.indexPath || 'index.html'
+    const indexPath = this.options.indexPath
 
     const PrerendererInstance = new Prerenderer({ staticDir: compiler.options.output.path, ...this.options, assets: compilation.assets })
     const prev = PrerendererInstance.modifyServer

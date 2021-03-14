@@ -108,10 +108,11 @@ module.exports = {
         // Normally a free port is autodetected, but feel free to set this if needed.
         port: 8001
       },
-      //renderer: new Renderer(),
+      renderer: require('@prerenderer/renderer-puppeteer'),
       // The actual renderer to use. (Feel free to write your own)
       // Available renderers: https://github.com/Tribex/prerenderer/tree/master/renderers
 
+      //The options to pass to the renderer class's constructor
       rendererOptions: {
         // Optional - The name of the property to add to the window object with the contents of `inject`.
         injectProperty: '__PRERENDER_INJECTED',
