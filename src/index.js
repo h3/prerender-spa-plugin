@@ -16,7 +16,7 @@ export default class PrerenderSPAPlugin {
     this.options.indexPath = this.options.indexPath || 'index.html'
     this.options.rendererOptions = Object.assign({ headless: true }, this.options.rendererOptions)
     if (!this.options.renderer.initialize) {
-      this.options.renderer = this.options.renderer(this.options.rendererOptions)
+      this.options.renderer = new this.options.renderer(this.options.rendererOptions)
     }
   }
 
