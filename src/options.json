@@ -32,6 +32,10 @@
         }
       }
     },
+    "urlModifier": {
+      "instanceof": "Function",
+      "description": "Hook to be able to modify the url to retrieve the compiled asset"
+    },
     "rendererOptions": {
       "type": "object",
       "additionalProperties": true,

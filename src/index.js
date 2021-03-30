@@ -16,6 +16,7 @@ export default class PrerenderSPAPlugin {
     this.options.indexPath = this.options.indexPath || 'index.html'
     this.options.rendererOptions = Object.assign({ headless: true }, this.options.rendererOptions)
     if (!this.options.renderer.initialize) {
+      // eslint-disable-next-line new-cap
       this.options.renderer = new this.options.renderer(this.options.rendererOptions)
     }
   }
@@ -41,6 +42,9 @@ export default class PrerenderSPAPlugin {
           url = url in compilation.assets || url.includes('.') ? url : url + '/' + indexPath
           if (url.startsWith('/')) {
             url = url.slice(1)
+          }
+          if (this.options.urlModifier) {
+            url = this.options.urlModifier(url)
           }
           if (url in compilation.assets) {
             if (url.endsWith('.json')) {
@@ -112,7 +116,7 @@ export default class PrerenderSPAPlugin {
       const HtmlWebpackPlugin = require('html-webpack-plugin')
       const hooks = HtmlWebpackPlugin.getHooks(compilation)
 
-      hooks.afterEmit.tapPromise(pluginName, () => this.prerender(compiler, compilation))
+      hooks.afterEmit.tapPromise(pluginName, async () => await this.prerender(compiler, compilation))
     })
   }
 }

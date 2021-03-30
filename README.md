@@ -136,6 +136,9 @@ module.exports = {
         // Optional - Wait to render until a certain amount of time has passed.
         // NOT RECOMMENDED
         renderAfterTime: 5000, // Wait 5 seconds.
+        // Optional - Cancel render if it takes more than a certain amount of time
+        // useful in combination with renderAfterDocumentEvent as it will avoid waiting infinitely if the event doesn't fire
+        timeout: 20000, // Cancel render if it takes more than 20 seconds
 
         // Other puppeteer options.
         // (See here: https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions)
@@ -155,48 +158,17 @@ module.exports = {
   // ...
 
   plugins: [
-    new PrerenderSPAPlugin(
-      // (REQUIRED) List of routes to prerender
-      [ '/', '/about', '/contact' ],
-      // (OPTIONAL) Compatible options from v2.
-      {
-        // NOTE: Unless you are relying on asynchronously rendered content,
-        // such as after an Ajax request, none of these options should be
-        // necessary. All synchronous scripts are already executed before
-        // capturing the page content.
+    new PrerenderSPAPlugin({
+        // (REQUIRED) List of routes to prerender
+        routes:  [ '/', '/about', '/contact' ],
 
-        // Wait until a specific event is fired on the document.
-        captureAfterDocumentEvent: 'custom-post-render-event',
-        // This is how you would trigger this example event:
-        // document.dispatchEvent(new Event('custom-post-render-event'))
-
-        // Wait until a specific element is detected with
-        // document.querySelector.
-        captureAfterElementExists: '#content',
-
-        // Wait until a number of milliseconds has passed after scripts
-        // have been executed. It's important to note that this may
-        // produce unreliable results when relying on network
-        // communication or other operations with highly variable timing.
-        captureAfterTime: 5000,
-
-        // path of index file. By default it's index.html in static root.
-        indexPath: path.resolve('/dist/path/to/index.html'),
-
-        // Manually transform the HTML for each page after prerendering,
-        // for example to set the page title and metadata in edge cases
-        // where you cannot handle this via your routing solution.
-        //
-        // The function's context argument contains two properties:
-        //
-        // - html :: the resulting HTML after prerendering)
-        // - route :: the route currently being processed
-        //            e.g. "/", "/about", or "/contact")
-        //
-        // Whatever is returned will be printed to the prerendered file.
-        // NOTE: this has been deprecated in favor of the `postProcess` option.
-        // See the documentation below.
-        postProcessHtml: function (context) {
+        rendererOptions: {
+            // headless: false,
+            renderAfterDocumentEvent: 'render-event',
+            inject: {},
+            timeout: 10000,
+        },
+        postProcess: function (context) {
           var titles = {
             '/': 'Home',
             '/about': 'Our Story',
@@ -212,20 +184,6 @@ module.exports = {
   ]
 }
 ```
-
-#### Additional Changes
-- It is no longer possible to use multiple `renderAfterX` (`captureAfterX`) options at the same time. Only one may be selected. The reason for this removal is to prevent ambiguity.
-- The recommended configuration format has changed from `new PrerenderSPAPlugin(staticDir: String, routes: Array<String>, config: Object)` to
-  ```javascript
-  new PrerenderSPAPlugin({
-    staticDir: String,
-    routes: String,
-    ...
-  })
-  ```
-  in order to reduce ambiguity. The old format still works for the time being.
-- The default renderer is no longer PhantomJS. It has been replaced with [puppeteer](https://github.com/GoogleChrome/puppeteer). It is fairly simple to develop your own renderer as well. An alternate [jsdom](https://github.com/tmpvar/jsdom)-based renderer is available at [@prerenderer/renderer-jsdom](https://www.npmjs.com/package/@prerenderer/renderer-jsdom).
-- `prerender-spa-plugin-next` is now based on [prerenderer](https://github.com/Tribex/prerenderer). Accordingly, most bugs should be reported in that repository.
 
 ## What is Prerendering?
 
