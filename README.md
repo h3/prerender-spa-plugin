@@ -174,7 +174,7 @@ module.exports = {
             '/about': 'Our Story',
             '/contact': 'Contact Us'
           }
-          return context.html.replace(
+          context.html = context.html.replace(
             /<title>[^<]*<\/title>/i,
             '<title>' + titles[context.route] + '</title>'
           )
@@ -257,15 +257,12 @@ postProcess(context) {
   if (context.route.endsWith('.html')) {
     context.outputPath = path.join(__dirname, 'dist', context.route)
   }
-
-  return context
 }
 
 postProcess(context) {
   return someAsyncProcessing(context.html)
     .then((html) => {
       context.html = html;
-      return context;
     });
 }
 ```

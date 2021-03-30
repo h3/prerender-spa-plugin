@@ -82,7 +82,7 @@ export default class PrerenderSPAPlugin {
 
         const isValid = renderedRoutes.every(r => typeof r === 'object')
         if (!isValid) {
-          throw new Error('[prerender-spa-plugin] Rendered routes are empty, did you forget to return the `context` object in postProcess?')
+          throw new Error('[prerender-spa-plugin] Rendered routes are not object, did you do something weird in postProcess?')
         }
       }
 
