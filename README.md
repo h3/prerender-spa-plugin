@@ -67,7 +67,6 @@ module.exports = {
 ```js
 const path = require('path')
 const PrerenderSPAPlugin = require('prerender-spa-plugin-next')
-const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
 
 module.exports = {
   plugins: [
